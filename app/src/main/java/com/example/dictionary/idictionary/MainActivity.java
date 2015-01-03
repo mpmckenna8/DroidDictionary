@@ -14,6 +14,8 @@ import android.provider.UserDictionary.Words;
 
 public class MainActivity extends ActionBarActivity {
 
+
+    public int bleppw = 3;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -8,11 +8,30 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.provider.UserDictionary.Words;
 
 
 public class MainActivity extends ActionBarActivity {
+
+    // For the SimpleCursorAdapter to match the UserDictionary columns to layout items
+
+    private static final String[] COLUMNS_TO_BE_BOUND = new String[]{
+            Words.WORD,
+            Words.FREQUENCY
+    };
+
+    private static final int[] LAYOUT_ITEMS_TO_FILL = new int[]{
+         android.R.id.text1,
+            android.R.id.text2
+    };
+
+
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,7 +39,7 @@ public class MainActivity extends ActionBarActivity {
 
         setContentView(R.layout.activity_main);
 
-        TextView dictText = (TextView) findViewById(R.id.dictionary_list_view);
+        ListView dictText = (ListView) findViewById(R.id.dictionary_list_view);
 
         // need to get the content resolver next
         ContentResolver resolver = getContentResolver();
@@ -36,29 +55,30 @@ public class MainActivity extends ActionBarActivity {
 
         try{
 
-            dictText.setText("The user dictionary contains " + currCount + " words. \n");
+            SimpleCursorAdapter adapter = new SimpleCursorAdapter(this,
+                    android.R.layout.two_line_list_item,
+                    cursor,
+                    //COLUMNS_TO_BE_BOUND
+                    COLUMNS_TO_BE_BOUND,
+                    LAYOUT_ITEMS_TO_FILL,
+                    0);
 
-            dictText.append("Columns: " + UserDictionary.Words._ID + " - " + UserDictionary.Words.FREQUENCY + " - " + UserDictionary.Words.WORD);
+            dictText.setAdapter(adapter);
 
-            // getting index of columns using Words con stants, which contain headers of columns
-            int idColumn = cursor.getColumnIndex(Words._ID);
-            int frequencyColumn = cursor.getColumnIndex(Words.FREQUENCY);
-            int wordColumn = cursor.getColumnIndex(Words.WORD);
-
-            // go through all the cursor
-            while(cursor.moveToNext()){
-                // use the index to extract the string value of the word
-                int id = cursor.getInt(idColumn);
-                int frequency = cursor.getInt(frequencyColumn);
-                String word = cursor.getString(wordColumn);
-
-                dictText.append("\n" + id + " - " + frequency + " - " + word);
-            }
         }
         finally {
 
-            cursor.close();
+           //cursor.close();
         }
+    }
+
+    @Override
+    protected void onDestroy(){
+
+        Log.v("destorying", "closing the curosr");
+       // cursor.close();
+
+        super.onDestroy();
     }
 
 
